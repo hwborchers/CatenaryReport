@@ -1,0 +1,85 @@
+#
+
+---
+title: "The Catenary as an optimization problem per Hans Borchers"
+author: "Balasubramanian Narasimhan"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+  theme: cerulean
+  toc: yes
+  toc_depth: 2
+---
+
+```{r echo=F}
+### get knitr just the way we like it
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  cache = FALSE
+)
+```
+
+## Introduction
+
+Several of us (Anqi Fu, Steven Diamond, John Miller, Stephen Boyd, and
+myself) have been developing the `cvxr` package for disciplined convex
+optimization. Anqi Fu gave a preview of `cvxr` at
+[useR!~2016](https://channel9.msdn.com/events/useR-international-R-User-conference/useR2016/CVXR-An-R-Package-for-Modeling-Convex-Optimization-Problems). In
+a private email, Hans Borchers enquired about using `cvxr` to solve
+the catenary problem; see his solution using various approaches at
+[The Catenary as an Optimization Problem](http://hwborchers.lima-city.de/Presents/catenary.html).
+
+We present the `cvxr` solution below using the version `0.0.0.9009+`.
+Note that the current versions produce copious output to aid our
+development efforts until the official release.
+
+
+## The `cvxr` solution to the Catenary problem
+
+```{r}
+library(cvxr)
+
+n <- 51
+L <- 2
+h <- L/(n-1)
+
+x <- Variable(2*n)
+B <- diag(2*n)
+B[1:n, 1:n] <- 0
+objective <- Minimize(SumEntries(B*x))
+
+A <- matrix(0, nrow=4, ncol=2*n)
+A[1, 1] <- A[2, n] <- A[3, n + 1] <- A[4, 2 * n] <- 1
+b <- matrix(c(0, 1, 1, 1), nrow=4)
+
+constraints = list( x >= 0, A * x == b )
+
+for (i in seq.int(n-1)) {
+    A <- matrix(numeric(2 * 2 * n), nrow = 2)
+    A[1, i] <- -1; A[1, i+1] <- 1
+    A[2, n+i] <- -1; A[2, n+i+1] <- 1
+    constraints <- c(constraints, Norm2(A*x) <= h)
+}
+prob <- Problem(objective, constraints)
+system.time(sole <- cvxr_solve(prob))
+```
+
+And then the plot per Hans' document.
+
+
+```{r}
+x <- sole$primal_values[[1]]
+xs <- x[1:n, 1, drop=TRUE]; ys <- x[(n+1):(2*n), 1, drop=TRUE]
+plot(c(0, 1), c(0, 1), type='n')
+lines(xs, ys, col="blue", lwd=2)
+
+points(c(0, 1), c(1, 1))
+curve(0.22964*cosh((x-0.5)/0.22964)-0.02603, 0, 1,
+      col="red", add=TRUE)
+grid()
+
+```

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>The Catenary Problem</title>
+
+<script src="catenary_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="catenary_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="catenary_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="catenary_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="catenary_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="catenary_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="catenary_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="catenary_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="catenary_files/navigation-1.1/tabsets.js"></script>
+<link href="catenary_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="catenary_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="/home/hwb/R/x86_64-pc-linux-gnu-library/3.5/BiocStyle/resources/html/bioconductor.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 828px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 246px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">The Catenary Problem</h1>
+<p class="author-name">Hans W. Borchers<span class="affil-mark">1</span></p>
+<p class="author-affiliation"><span class="affil-mark">1</span>Duale Hochschule Baden-Württemberg, Mannheim, Germany</p>
+<h4 class="date"><em>27 Oktober 2018</em></h4>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>I was thinking about a good test case to evaluate different versions of <code>auglag</code>, say with <code>optim</code>, <code>nlminb</code>, or <code>ucminf</code>. I found the <em>catenary</em> curve to be a good one. The aim is to solve the “hanging chain” problem not as a differential equation, but as an optimization problem.</p>
+<div id="the-theoretical-solution" class="section level2">
+<h2><span class="header-section-number">1.1</span> The theoretical solution</h2>
+<p>First we reproduce the exact solution for a chain of length <span class="math inline">\(L = 2\)</span> in the <span class="math inline">\((x,y)\)</span>-plane, from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((1,0)\)</span>. The theoretical solution is
+<span class="math display">\[
+  y = a\,\cosh(\frac{x}{a})
+\]</span>
+where the distance <span class="math inline">\(w\)</span> between the fixed points, the length <span class="math inline">\(L\)</span> of the chain, and the <em>curvature radius</em> <span class="math inline">\(a\)</span> are related to each other through
+<span class="math display">\[
+  L = 2 a\,\sinh(\frac{w}{2a})
+\]</span></p>
+<p>We calculate the parameter <span class="math inline">\(a\)</span> in R as a solution of this as a function in <span class="math inline">\(a\)</span>:</p>
+<pre class="r"><code>w &lt;- 1; L &lt;- 2
+fun &lt;- function(x) L - 2*x*sinh(w/(2*x))
+aa &lt;- uniroot(fun, c(0.1, 0.5))$root        # 0.22965</code></pre>
+<p>The chain curve is symmetric around <span class="math inline">\(0.5\)</span> and the fixed points shall have a height of 1.0 above the ground.</p>
+<pre class="r"><code>bb &lt;- aa * cosh(0.5/aa)                        # 0.02597928
+cy &lt;- function(x) aa * cosh((x - 0.5)/aa) - bb + 1.0</code></pre>
+<p><img src="catenary_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+</div>
+<div id="the-catenary-as-an-optimization-problem" class="section level2">
+<h2><span class="header-section-number">1.2</span> The catenary as an optimization problem</h2>
+<p>So we are assuming a chain of length 2 is bound to the points <span class="math inline">\(P1 = (0,1)\)</span> and <span class="math inline">\(P2 = (1,1)\)</span> with gravitational force acting in negative y-direction.</p>
+<pre class="r"><code>N &lt;- 101        # no. of points
+L &lt;- 2          # total length of chain
+h &lt;- L / (N-1)  # maximal length of each chain link</code></pre>
+<p>The decision variables are the x- and y-coordinates of the beginning and end of the chain elements. We will look at the cases of 101 points, that is 100 chain links.</p>
+<p>The parameter vector <code>c(x, y)</code> has dimension <span class="math inline">\(2 N\)</span>, the concatenated vector of x- and y-coordinates. The objective function is simply to minimize the potential energy.</p>
+<pre class="r"><code>fnobj &lt;- function(p)  sum(p[(N+1):(2*N)])  # sum(y)
+
+grobj &lt;- function(p)  c(rep(0, N), rep(1, N))</code></pre>
+<p>We will use the exaxt gradient, as it is so easy to write down.</p>
+<p>We have two kinds of constraints, equality and inequality constraints. The equality constraints fix the beginning and end of the chain to the points <span class="math inline">\(P1\)</span> an¡“¡“d <span class="math inline">\(P2\)</span>. Therefore:</p>
+<pre class="r"><code>heq &lt;- function(p) {
+    c(p[1], p[N] - 1, p[N+1] - 1, p[2*N] - 1)
+}</code></pre>
+<p>The inequality constraints fix the length of the individual chain links to be <span class="math inline">\(h\)</span> maximally, so the total length is <span class="math inline">\(L = (N-1) h = 2\)</span>.</p>
+<pre class="r"><code>hin &lt;- function(p) {
+    x &lt;- p[1:N]; y &lt;- p[(N+1):(2*N)]
+    h^2 - diff(x)^2 - diff(y)^2
+}</code></pre>
+<p>The starting configuration will be with all links on the zero level.</p>
+<pre class="r"><code>x0 &lt;- seq(0, 1, length.out=N)
+p0 &lt;- c(x0, rep(0, N))</code></pre>
+</div>
+</div>
+<div id="the-augmented-lagrangian-approach" class="section level1">
+<h1><span class="header-section-number">2</span> The ‘augmented Lagrangian’ approach</h1>
+<div id="auglag-with-optim" class="section level2">
+<h2><span class="header-section-number">2.1</span> auglag() with ‘optim’</h2>
+<p>First we will solve it with <code>alabama::auglag</code>. There are two choices for the inner solver, <code>optim</code> with method <code>BFGS</code>, or <code>nlminb</code> (both in base R).</p>
+<pre class="r"><code>system.time(
+sol1 &lt;- alabama::auglag(p0, fnobj, grobj, hin=hin, heq=heq,
+                        control.outer=list(trace=FALSE, eps=1e-08),
+                        control.optim=list(maxit=500, reltol=1e-08))
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##  29.933   4.971  35.364</code></pre>
+<p>This is not a good approximation of the true catenary line, as we will see in a minute. Changing the tolerances will not help, but I had to increase the maximum number of iterations, the default value <code>100</code> is much too small.</p>
+<p><code>optim</code> uses its own calculation of the ‘Jacobians’. Instead we will apply the finite-difference Jacobians of the <em>pracma</em> package here (using the Jacobians from the <em>numDeriv</em> package will slow down the calculations too much).</p>
+<pre class="r"><code>library(pracma)
+heq.jac &lt;- function(p) pracma::jacobian(heq, p)
+hin.jac &lt;- function(p) pracma::jacobian(hin, p)
+
+system.time(
+sol2 &lt;- alabama::auglag(p0, fnobj, grobj, hin=hin, heq=heq,
+                        hin.jac = hin.jac, heq.jac = heq.jac,
+                        control.outer=list(trace=FALSE, eps=1e-08),
+                        control.optim=list(maxit=500, reltol=1e-08))
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##  45.937   7.288  53.352</code></pre>
+<p>Let’s plot the generated curves to check plausibility for the moment.</p>
+<p><img src="catenary_files/figure-html/unnamed-chunk-11-1.png" width="100%" /></p>
+<p>The red curve is the solution generated by <code>optim</code> with method ‘BFGS’ and Jacobians calculated by the inner solver. What is striking is that the solution is not symmetric as it should be. <code>optim</code> still returns <code>sol1$convergence=0</code>, that is successful convergence.</p>
+<p>The blue curve uses Jacobians calculated with higher precision and lies almost exactly on top of the exact solution (in gray). The maximal distance between this curve and the true catenary line is <span class="math inline">\(1.5\cdot 10^{-4}\)</span> and the RMS error is <span class="math inline">\(7.3\cdot10^{-5}\)</span>.</p>
+<pre class="r"><code>xx &lt;- x2[1:N]; yy &lt;- x2[(N+1):(2*N)]
+sqrt(sum((yy - cy(xx))^2) / (N+1))</code></pre>
+<pre><code>## [1] 7.300808e-05</code></pre>
+<pre class="r"><code>max(abs(yy - cy(xx)))</code></pre>
+<pre><code>## [1] 0.0001544463</code></pre>
+</div>
+<div id="auglag-with-nlminb" class="section level2">
+<h2><span class="header-section-number">2.2</span> auglag() with ‘nlminb’</h2>
+<p>Calling <code>auglag</code> with <code>nlminb</code> as inner solver is a viable alternative. The control parameters for the inner solver are different, though, especially the <code>step.min</code> has been found by trial and error.</p>
+<pre class="r"><code>system.time(
+sol3 &lt;- alabama::auglag(p0, fnobj, grobj, hin=hin, heq=heq,
+                    hin.jac = hin.jac, heq.jac = heq.jac,
+                    control.outer=list(trace=FALSE, method=&quot;nlminb&quot;),
+                    control.optim=list(iter.max=500, rel.tol=1e-10, 
+                                       step.min=0.5))
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##  56.086   8.659  64.965</code></pre>
+<p>The generated curve looks like this:</p>
+<p><img src="catenary_files/figure-html/unnamed-chunk-14-1.png" width="100%" /></p>
+<p>We see that this solver does not come up with correct solutions or good approximation. <code>nlminb</code> at least indicates non-convergence by saying <code>sol2$convergence=1</code>.</p>
+<p>Both versions of <code>auglag</code> take quite a long time to solve the catenary problem, so the question remains: Can we solve this problem even more exact and in much shorter time?</p>
+</div>
+<div id="nlopt-with-slsqp" class="section level2">
+<h2><span class="header-section-number">2.3</span> NLopt with SLSQP</h2>
+<p>It would be natural to solve the catenary problem with augmented Lagrangian procedure <code>auglag()</code> from the <em>nloptr</em> package, either with gradient through <code>BFGS</code> or without gradients using the <code>COBYLA</code> approach. Unfortunately, I have not been able to call <code>nloptr::auglag()</code> correctly.</p>
+<p>Instead I will apply the NLopt routine SLSQP directly. <code>slsqp()</code> realizes “sequential quadratic programming” (SQP) and appears thus to be specially appropriate for a problem with quadratic objective and/or constraints.</p>
+<pre class="r"><code>require(nloptr, quietly=TRUE)
+system.time(
+sol &lt;- nloptr::slsqp(p0, fnobj, gr=grobj,
+                     hin=hin, hinjac=hin.jac,
+                     heq=heq, heqjac=heq.jac)
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##  24.256   2.014  26.576</code></pre>
+<p>This solves the catenary problem as exactly as <code>auglag</code> with method BFGS above, but in much less time. For decidedly more than 100 points the solver will stop working and return the starting point. For 100 chain links the RMS error is <span class="math inline">\(8\cdot10^{-5}\)</span> and the maximal distance <span class="math inline">\(0.0001369\)</span>.</p>
+<p>By the way: Trying to utilize packages ‘Rsolnp’ or ‘NlcOptim’ was entirely in vain. The results were either completely wrong or returned simply the starting point. Probably calling the procedures was done incorrectly, though I was unable to identify a correct call in several tries.</p>
+</div>
+</div>
+<div id="the-conic-programming-socp-approach" class="section level1">
+<h1><span class="header-section-number">3</span> The ‘conic programming’ (SOCP) approach</h1>
+<div id="solving-with-ecosolver" class="section level2">
+<h2><span class="header-section-number">3.1</span> Solving with <em>ECOSolveR</em></h2>
+<p>The catenary problem is formulated as a linear objective with quadratic constraints, QCLP. As there are no linear solvers with such constraints, the next step up would be to handle it as quadratic with quadratic constraints, QCQP. Quadratic solvers in R do not allow for quadratic constraints, so the next logical step is solving it as a convex problem with convex constraints.</p>
+<p>A quite powerful solver for these kinds of problems is ECOS, an embedded conic solver, integrated with R in the <em>ECOSolver</em> package. Using the interface of <em>ECOSolver</em> can get quite complicated. Stephen Boyd and colleagues are building another package <em>cvxr</em> that will define an optimization modeling language, maybe a bit similar to Julia’s <em>JuMP</em> module.</p>
+<pre class="r"><code>require(Matrix, quietly=TRUE)
+require(ECOSolveR, quietly=TRUE)
+
+N &lt;- 101                # 2N + 1 variables
+L &lt;- 1; h &lt;- 2/(N-1)</code></pre>
+<p>We will add one more variable <span class="math inline">\(x_0\)</span> resp. <span class="math inline">\(x_{2N+1}\)</span> to the coordinates in order to be able to define the conic inequality constraints. Therefore, the objective function is</p>
+<pre class="r"><code>c &lt;- c(rep(0,N), rep(1,N), 0)</code></pre>
+<p>The extra variable will have a fixed value of <span class="math inline">\(h\)</span>. Together with fixing the left and right end points of the chain we can define the following <em>sparse</em> matrix <span class="math inline">\(A\)</span> and RHS <span class="math inline">\(b\)</span>:</p>
+<pre class="r"><code>A &lt;- Matrix(0, nrow=5, ncol=2*N+1, sparse=TRUE)
+A[1, 2*N+1] &lt;- 1                # x[2*N+1] = 1
+A[2, 1] &lt;- 1; A[3, N] &lt;- 1      # x[1] = 0; x[N] = 1
+A[4, N+1] &lt;- 1; A[5, 2*N] &lt;- 1  # y[1] = 1; y[N] = 1
+
+b = c(h, 0, 1, 1, 1)</code></pre>
+<p>The inequality constraints are all of the form <span class="math inline">\((x_{i+1}-x_i)^2 + (y_{i+1}-y_i)^2 \le h\)</span>. For a “conic formulation” we need a linear functional <span class="math inline">\(G_i\)</span> such that (remember, <span class="math inline">\(y_i = x_{N+i}\)</span>)
+<span class="math display">\[
+    G_i(x) = (h, x_{i+1}-x_i, x_{N+i+1}-x_{N+i}) = (h, X) \in K
+\]</span>
+as being an element of cone <span class="math inline">\(K\)</span> means <span class="math inline">\(h \ge ||X||_2\)</span> – or: the <span class="math inline">\(i\)</span>-th chain link is smaller than <span class="math inline">\(h\)</span>. The following <em>sparse</em> matrix <span class="math inline">\(G\)</span> defines <span class="math inline">\(N-1\)</span> such submatrices <span class="math inline">\(G_i\)</span>, each three rows and <span class="math inline">\(2N+1\)</span> columns.</p>
+<pre class="r"><code>G &lt;- Matrix(0, nrow=3*(N-1), ncol=2*N+1, sparse=TRUE)
+
+for (i in 1:(N-1)) {
+    j &lt;- 3*(i-1) + 1
+    G[j, 2*N+1] &lt;- -1
+    G[j+1, i] &lt;- -1; G[j+1, i+1] &lt;- 1
+    G[j+2, N+i] &lt;- -1; G[j+2, N+i+1] &lt;- 1
+}</code></pre>
+<p>In the conic formulation <span class="math inline">\(G_i(x) \le{}_K h\)</span> we do not need the <span class="math inline">\(h\)</span>s, so the right hand side is:</p>
+<pre class="r"><code>H &lt;- rep(0, 3*(N-1))</code></pre>
+<p>and as each three rows belong together, the <code>dims</code> argument is:</p>
+<pre class="r"><code>quad &lt;- as.integer(rep(3, N-1))</code></pre>
+<p>Now we have gathered all puzzle pieces and call the ECOS solver:</p>
+<pre class="r"><code>system.time(
+  sole &lt;- ECOS_csolve(c, G, H, dims=list(q=quad), A, b)
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##   0.003   0.000   0.003</code></pre>
+<p>The solution exactly follows the theoretical solution (the red line).</p>
+<p><img src="catenary_files/figure-html/unnamed-chunk-23-1.png" width="100%" /></p>
+<p>The maximal distance between this curve and the true catenary line is <span class="math inline">\(3.5\cdot 10^{-4}\)</span> and the RMS error is <span class="math inline">\(3.5\cdot10^{-4}\)</span>. This is comparable to the figures above for <code>auglag</code> with the BFGS method – but consider the 10000-fold faster computation times!</p>
+<p>The timings are 2/3/36 milliseconds for 50/100/1000 chain links.</p>
+</div>
+<div id="solving-with-scs" class="section level2">
+<h2><span class="header-section-number">3.2</span> Solving with <em>SCS</em></h2>
+<p>SCS (Conic Splitting Solver) is another of the solvers developed by Stephen Boyd and colleagues at Stanford University. An R interface is available in the <em>scs</em> package maintained by Florian Schwendinger.</p>
+<p>The API of <code>scs()</code> is similar to that one for <code>ECOS_csolve()</code> except that the matrices <code>A</code> and <code>G</code> are combined into one, and then necessarily also <code>b</code> and <code>h</code>. So with all the (sparse) matrices and vectors defined in the section on the <em>ECOSolveR</em> package we can call <code>scs()</code> in just one line.</p>
+<pre class="r"><code>library(scs)
+system.time(
+sols &lt;- scs(A=rbind(A, G), b=c(b, H), obj=c,
+            cone=list(f=nrow(A), q=quad))
+)</code></pre>
+<pre><code>##    user  system elapsed 
+##    0.01    0.00    0.01</code></pre>
+<p>The timings for <em>scs</em> are 2/10/280 for 50/100/1000 links. The RMS error (‘root mean square error’) for 50 links is 0.0001514 compared to 0.0001508 for ECOS.</p>
+</div>
+<div id="solving-with-sdpt3" class="section level2">
+<h2><span class="header-section-number">3.3</span> Solving with <em>sdpt3</em></h2>
+<p>Needs to be done.</p>
+</div>
+<div id="solving-with-rmosek" class="section level2">
+<h2><span class="header-section-number">3.4</span> Solving with <em>Rmosek</em></h2>
+<p>MOSEK is an interior-point solver for large-scale optimization problems. MOSEK is capable of efficiently solving LP, QP, SOCP, and SDP problems. MOSEK is commercial, but there are academic licenses available.</p>
+<p>Package <em>Rmosek</em> provides an R interface for the MOSEK program if MOSEK itself is already installed on the system. Setting up a problem in a form appropriate for sending it to MOSEK is still quite complicated as can be seen from the following code handling the catenary problem for <em>Rmosek</em> and MOSEK.</p>
+<pre class="r"><code>require(Matrix, quietly=TRUE)
+require(Rmosek, quietly=TRUE)
+
+N &lt;- 51                 # 2N + 2N-2 + N-1 variables
+L &lt;- 1; h &lt;- 2/(N-1)
+
+# model list cp with cp$c the linear objective
+cp &lt;- list(sense=&quot;min&quot;) # minimization problem
+cp$c &lt;- c(rep(0,N), rep(1,N), rep(0,3*N-3))
+
+# sparse matrix defining the differences x_i - x_{i+1}
+A &lt;- Matrix(0, nrow=2*N-2, ncol=5*N-3, sparse=TRUE)
+for (i in 1:(N-1)) {
+    A[i,i] &lt;- 1; A[i,i+1] &lt;- -1; A[i,2*N+i] &lt;- 1
+    A[N-1+i,N+i] &lt;- 1; A[N-1+i,N+i+1] &lt;- -1; A[N-1+i,3*N-1+i] &lt;- 1
+}
+cp$A &lt;- A
+
+# rhs of the linear equalities defined through matrix A
+cp$bc &lt;- rbind(blc=rep(0,2*N-2), buc=rep(0,2*N-2))
+
+# bounds on the free variables
+cp$bx &lt;- rbind(blx=c(0,rep(-Inf,N-2),1,0,
+               rep(-Inf,N-2),0,rep(-Inf,2*N-2),rep(h,N-1)),
+               bux=c(0,rep( Inf,N-2),1,0,rep( Inf,N-2),0,
+               rep( Inf,2*N-2),rep(h,N-1)))
+
+# define the cones h &gt;= ||(x_i-x_{i+1})^2 + (y_i-y_{i+1})^2||
+co &lt;- cbind(list(&quot;QUAD&quot;, c(4*N-2+1, 2*N+1, 3*N)))
+for (i in 2:(N-1)) {
+    co &lt;- cbind(co, list(&quot;QUAD&quot;, c(4*N-2+i, 2*N+i, 3*N-1+i)))
+}
+cp$cones &lt;- co
+
+system.time(r &lt;- mosek(cp, opts=list(verbose=1)))</code></pre>
+<p>Plotting the solution <code>r$sol$itr$xx</code> against the theoretical solution as above generates the the same plots as above. MOSEK solves the catenary problem with 50/100/1000 points in 4/5/33 microseconds.</p>
+</div>
+</div>
+<div id="using-modeling-languages" class="section level1">
+<h1><span class="header-section-number">4</span> Using Modeling Languages</h1>
+<p>Modeling languages for optimization (and scheduling) allow the user to describe and solve large and complex optimization problems with a syntax similar to the mathematical notation used for these kinds of problems. Examples are AMPL, GAMS, Zimpl, or MathProg.</p>
+<div id="cvxr" class="section level2">
+<h2><span class="header-section-number">4.1</span> CVXR</h2>
+<p>CVXR is a recent R package, derived from the MATLAB CVX toolbox, that provides an object-oriented modeling language for convex optimization. CVXR enforces “disciplined convex programming” (DCP) rules to guarantee problem convexity.</p>
+<pre class="r"><code>require(CVXR, quietly = TRUE, warn.conflicts = FALSE)
+
+N &lt;- 100; L &lt;- 2
+h &lt;- L / (N-1)
+x &lt;- Variable(N)
+y &lt;- Variable(N)
+objective  &lt;- Minimize(sum(y))
+constraint &lt;- list(x[1]==0, x[N]==1, y[1]==1, y[N]==1,
+                   diff(x)^2 + diff(y)^2 &lt;= h^2)
+problem &lt;- Problem(objective, constraint)
+system.time(result &lt;- solve(problem))</code></pre>
+<pre><code>##    user  system elapsed 
+##   0.300   0.010   0.312</code></pre>
+<pre class="r"><code>xm &lt;- result$getValue(x)
+ym &lt;- result$getValue(y)
+#  result
+## $status:     &quot;optimal&quot;
+## $solver:     &quot;ECOS&quot;
+## $solve_time: 0.009317219
+## $setup_time: 0.000722513</code></pre>
+<p>The default sover in CVXR is ECOS, see above, but it is also possible to set SCS as solver for a CVXR model.</p>
+<pre class="r"><code>system.time(result &lt;- solve(problem, solver = &quot;SCS&quot;))</code></pre>
+<pre><code>##    user  system elapsed 
+##   0.309   0.000   0.310</code></pre>
+<pre class="r"><code>#           FEASTOL = 1e-4, RELTOL = 1e-3, verbose=FALSE
+
+#  result
+## $status:     &quot;optimal_inaccurate&quot;
+## $solver:     &quot;SCS&quot;
+## $num_iters:  2500</code></pre>
+<p>In this setting, SCS does not find an accurate solution, a fact for which the high number of iterations is also an indication. The reason is unclear for the moment, as SCS alone does find a good solution, see above.</p>
+</div>
+<div id="roi" class="section level2">
+<h2><span class="header-section-number">4.2</span> ROI</h2>
+<pre class="r"><code>library(Matrix)
+library(slam)
+require(ROI, quietly = TRUE, warn.conflicts = FALSE)</code></pre>
+<pre><code>## ROI.plugin.ecos: R Optimization Infrastructure</code></pre>
+<pre><code>## Registered solver plugins: nlminb, ecos.</code></pre>
+<pre><code>## Default solver: auto.</code></pre>
+<pre class="r"><code># library(ROI.plugin.ecos)
+
+N &lt;- 101                # 2N + 1 variables
+L &lt;- 1; h &lt;- 2/(N-1)
+c &lt;- c(rep(0,N), rep(1,N), 0)
+
+A &lt;- Matrix(0, nrow=5, ncol=2*N+1, sparse=TRUE)
+A[1, 2*N+1] &lt;- 1                # x[2*N+1] = 1
+A[2, 1] &lt;- 1; A[3, N] &lt;- 1      # x[1] = 0; x[N] = 1
+A[4, N+1] &lt;- 1; A[5, 2*N] &lt;- 1  # y[1] = 1; y[N] = 1
+
+b = c(h, 0, 1, 1, 1)
+
+G &lt;- Matrix(0, nrow=3*(N-1), ncol=2*N+1, sparse=TRUE)
+
+for (i in seq_len(N-1)) {
+    j &lt;- 3*(i-1) + 1
+    G[j, 2*N+1] &lt;- -1
+    G[j+1, i] &lt;- -1; G[j+1, i+1] &lt;- 1
+    G[j+2, N+i] &lt;- -1; G[j+2, N+i+1] &lt;- 1
+}
+
+H &lt;- rep(0, 3*(N-1))
+quad &lt;- as.integer(rep(3, N-1))
+
+op &lt;- OP( L_objective(c), 
+          C_constraint(L = as.simple_triplet_matrix(rbind(A, G)), 
+                       cones = c(K_zero(NROW(A)), K_soc(quad)), 
+                       rhs = c(b, H)),
+          bounds = V_bound(ld = -Inf, nobj = length(c)) )
+
+system.time(roi_ecos &lt;- ROI_solve(op, solver=&quot;ecos&quot;))</code></pre>
+<pre><code>##    user  system elapsed 
+##   0.026   0.000   0.027</code></pre>
+<pre class="r"><code># solution(roi_ecos)  # or: roi_ecos$solution
+roi_ecos$status</code></pre>
+<pre><code>## $code
+## [1] 0
+## 
+## $msg
+##   solver ecos
+##     code 0
+##   symbol ECOS_OPTIMAL
+##  message Optimal solution found.
+## roi_code 0</code></pre>
+<p>The maximal distance to the true catenary line is <span class="math inline">\(1.35\cdot 10^{-4}\)</span> and the RMS error is <span class="math inline">\(7.7\cdot10^{-5}\)</span>. The final computation is 10 times faster than with CVXR, but for CVXR includes the build-up of the model matrices.</p>
+</div>
+<div id="julia-jump" class="section level2">
+<h2><span class="header-section-number">4.3</span> Julia JuMP</h2>
+<p>JuMP is a domain-specific modeling language for mathematical optimization, embedded in the Julia programming language. It supports a number of open-source and commercial solvers for a variety of problem classes, including second-order conic programming.</p>
+<p>The following is a formulation of the catenary problem in JuMP, calling ECOS as conic solver. A correct and highly accurate result is returned within 0.0065/0.0157/0.4158 seconds for 50/100/1000 points.</p>
+<pre><code>using JuMP
+using ECOS
+
+n = 51
+L = 2; h = L/(n-1)
+
+m = Model(solver=ECOSSolver())
+
+@variable(m, x[1:(2*n)] &gt;= 0.0)
+@objective(m, Min, sum{x[i], i=(n+1):(2*n)})
+
+@constraints(m, begin
+  x[1]   == 0; x[n]   == 1
+  x[n+1] == 1; x[2*n] == 1
+end)
+
+for i in 1:(n-1)
+    A = zeros(2, 2*n)
+    A[1, i] = -1; A[1, i+1] = 1
+    A[2, n+i] = -1; A[2, n+i+1] = 1
+    @constraint(m, soc, norm(A*x) &lt;= h)
+end
+
+status = solve(m)</code></pre>
+</div>
+<div id="ampl" class="section level2">
+<h2><span class="header-section-number">4.4</span> AMPL</h2>
+<p>AMPL (A Mathematical Programming Language) is an algebraic modeling language, developed by Fourer, Gay, und Kernighan at Bell Laboratories. AMPL can be used to describe large-scale optimization and scheduling problems. Many solvers on the NEOS server accept input formulated in AMPL, for instance IPOPT.</p>
+<p>The following is an AMPL code to set up the catenary problem, as described in the introduction above.</p>
+<pre><code>param N := 100; # number of chainlinks
+param L := 1;   # difference in x-coords of endlinks
+
+param h := 2*L/N;   # length of each link
+
+var x {0..N};   # x-coordinates of endpoints of chainlinks
+var y {0..N};   # y-coordinates of endpoints of chainlinks
+
+minimize pot_energy: sum{j in 1..N} (y[j-1] + y[j])/2;
+
+subject to x_left_anchor: x[0] = 0;
+subject to y_left_anchor: y[0] = 0;
+subject to x_right_anchor: x[N] = L;
+subject to y_right_anchor: y[N] = 0;
+
+subject to link_up {j in 1..N}:
+    (x[j] - x[j-1])^2 + (y[j] - y[j-1])^2 &lt;= h^2;
+
+let {j in 0..N} x[j] := j*L/N;
+let {j in 0..N} y[j] := 0;
+
+solve;
+
+printf {j in 0..N}: &quot;%10.5f %10.5f \n&quot;, x[j], y[j]</code></pre>
+<p>Sending this as a file to the IPOPT solver on NEOS will return x- and y-coordinates that solve the catenary with an RMS error of <span class="math inline">\(9\cdot10^{-5}\)</span> resp. a maximal distance of <span class="math inline">\(0.0001508\)</span> in <span class="math inline">\(2\)</span> milliseconds run-time for 100 chain links.</p>
+<p>There is now an ‘ipoptr’ package on CRAN that connects to the IPOPT module in Julia and returns results to R. We will in the future try out this package and see whether we can get the same results as by calling IPOPT on the NEOS server directly.</p>
+</div>
+</div>
+<div id="references" class="section level1">
+<h1><span class="header-section-number">5</span> References</h1>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": {
+      styles: {
+        ".MathJax_Display": {
+           "text-align": "center",
+           padding: "0px 150px 0px 65px",
+           margin: "0px 0px 0.5em"
+        },
+      }
+    }
+  });
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

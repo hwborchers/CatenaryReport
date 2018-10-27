@@ -1,0 +1,7 @@
+base
+BiocStyle
+pracma
+Matrix
+ECOSolveR
+scs
+nloptr
